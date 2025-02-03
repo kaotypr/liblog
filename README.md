@@ -1,4 +1,4 @@
-# liblog
+# @kaotypr/liblog
 
 A lightweight and configurable logging utility for JavaScript/TypeScript "library" with scope-based logging control.
 Create the liblog utils in your library, export and use it in anywhere your library.
@@ -21,7 +21,7 @@ NOTE: always set the log levels to false in your production environment unless y
 ## Installation
 
 ```bash
-npm install liblog
+npm install @kaotypr/liblog
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ npm install liblog
 ### Basic Usage
 
 ```typescript
-import { createLiblog, createLiblogConfig } from 'liblog';
+import { createLiblog, createLiblogConfig } from '@kaotypr/liblog';
 
 // Initialize with default configuration
 const liblogConfig = createLiblogConfig();
@@ -47,7 +47,7 @@ liblog.info('Hello, world!'); // Output: Hello, world!
 ### Scoped Logging
 
 ```typescript
-import { createLiblog, createLiblogConfig } from 'liblog';
+import { createLiblog, createLiblogConfig } from '@kaotypr/liblog';
 
 // Define your scope types
 type Scope = 'auth' | 'api' | 'db';
@@ -73,7 +73,7 @@ apiLog.error('Request failed'); // Output: [api]: Request failed
 ### Custom Scope Prefixes
 
 ```typescript
-import { createLiblog, createLiblogConfig } from 'liblog';
+import { createLiblog, createLiblogConfig } from '@kaotypr/liblog';
 
 const liblogConfig = createLiblogConfig<'custom'>();
 
