@@ -1,7 +1,7 @@
 {
   "name": "liblog",
   "version": "1.0.0",
-  "description": "",
+  "description": "Configurable logging utility for JavaScript/TypeScript libraries with scope-based logging control",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -12,16 +12,20 @@
     "build": "tsup"
   },
   "keywords": [
+    "logging",
+    "typescript",
+    "scope",
+    "debug",
     "console",
-    "log",
-    "logger",
-    "library log",
-    "library level",
-    "configurable console",
-    "configurable log"
+    "library"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "kao",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaotypr/liblog.git"
+  },
+  "homepage": "https://github.com/kaotypr/liblog#readme",
   "devDependencies": {
     "tsup": "^8.3.6",
     "typescript": "^5.7.3"
