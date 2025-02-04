@@ -1,6 +1,6 @@
 {
   "name": "@kaotypr/liblog",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Configurable logging utility for JavaScript/TypeScript libraries with scope-based logging control",
   "type": "module",
   "main": "dist/index.mjs",
