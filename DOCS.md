@@ -72,6 +72,11 @@ const liblogConfig = new LiblogConfig<Scopes>();
 const apiLog = createLiblog(liblogConfig, { scope: 'api' });
 const authLog = createLiblog(liblogConfig, { scope: 'auth' });
 
+// set default "verbose" level logging for all scopes
+liblogConfig.set({
+  verbose: true,
+});
+
 // Enable logging for specific scopes
 liblogConfig.set(['auth', 'api'], {
   info: true,
@@ -79,6 +84,7 @@ liblogConfig.set(['auth', 'api'], {
 });
 
 // Use scoped logging
+authLog.debug('Auth debug'); // Output: [auth]: Auth debug
 apiLog.info('Request received'); // Output: [api]: Request received
 authLog.error('Login failed'); // Output: [auth]: Login failed
 
@@ -109,9 +115,9 @@ const dbLog = createLiblog(liblogConfig, {
 
 liblogConfig.set(['api', 'auth', 'db'], { info: true });
 
-apiLog.info('Hello'); // Output: [api]: Hello
-authLog.info('Hello'); // Output: Hello
-dbLog.info('Hello'); // Output: DB >> Hello
+apiLog.info('Hello');   // Output: [api]: Hello
+authLog.info('Hello');  // Output: Hello
+dbLog.info('Hello');    // Output: DB >> Hello
 ```
 
 ## Available Log Levels
@@ -129,12 +135,12 @@ dbLog.info('Hello'); // Output: DB >> Hello
 
 ```typescript
 liblogConfig.set({
-  verbose: true, // Enable debug logging
-  info: true, // Enable info logging
-  warning: true, // Enable warning logging
-  error: true, // Enable error logging
-  dir: true, // Enable dir logging
-  table: true, // Enable table logging
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
 });
 ```
 
@@ -142,21 +148,21 @@ liblogConfig.set({
 
 ```typescript
 liblogConfig.set('scope1', {
-  verbose: true, // Enable debug logging
-  info: true, // Enable info logging
-  warning: true, // Enable warning logging
-  error: true, // Enable error logging
-  dir: true, // Enable dir logging
-  table: true, // Enable table logging
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
 });
 
 liblogConfig.set(['scope1', 'scope2'], {
-  verbose: true, // Enable debug logging
-  info: true, // Enable info logging
-  warning: true, // Enable warning logging
-  error: true, // Enable error logging
-  dir: true, // Enable dir logging
-  table: true, // Enable table logging
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
 });
 ```
 
@@ -168,12 +174,12 @@ const appLog = createLiblog(liblogConfig);
 const featureLog = createLiblog(liblogConfig, { scope: 'feature' });
 
 appLog.config.set({
-  verbose: true, // Enable debug logging
-  info: true, // Enable info logging
-  warning: true, // Enable warning logging
-  error: true, // Enable error logging
-  dir: true, // Enable dir logging
-  table: true, // Enable table logging
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
 });
 
 featureLog.config.set({
