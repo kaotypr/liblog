@@ -1,26 +1,42 @@
 import { createLiblog } from '../src/liblog';
-import { createLiblogConfig } from '../src/liblog-config';
+import { LiblogConfig } from '../src/liblog-config';
 
-// Define scope type
-type Scope = 'scope1' | 'scope2';
+// Initialize liblog config
+const liblogConfig = new LiblogConfig();
 
-// Initialize liblog with scopes type
-const liblogConfig = createLiblogConfig<Scope>();
+// Create liblog utils for each scope
+const liblog = createLiblog(liblogConfig);
 
-// Create liblog utils (default scope)
-const liblog = createLiblog(liblogConfig.get);
+// Try to log without log level set to true
+liblog.info('this is not printed'); // no ouput
 
-liblog.info('hello world'); // no console.info
-
+// Set "info" log level to true
 liblogConfig.set({
   info: true,
 });
 
-liblog.info('hello world'); // console.info('hello world')
-liblog.error('hello world error => 1'); // no console.error
+// Try to log again
+liblog.info('hello world'); // Output, "hello world"
 
-liblogConfig.set({
-  error: true,
+// Set the config to false from `liblog.config.set`
+liblog.config.set({
+  info: false,
 });
 
-liblog.error('hello world error => 2'); // console.error('hello world error => 2')
+// Try to log again after "info" log level set to false
+liblog.info('this is not printed'); // No ouput
+
+// Set the config to true from `liblog.config.set`
+liblog.config.set({
+  info: true,
+});
+
+liblog.info('hello world again'); // Output, "hello world again"
+
+/**
+ * bun run examples/v2/basic-usage.ts
+ * Output:
+ *
+ * hello world
+ * hello world again
+ */

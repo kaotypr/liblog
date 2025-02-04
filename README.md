@@ -29,35 +29,48 @@ npm install @kaotypr/liblog
 ### Basic Usage
 
 ```typescript
-import { createLiblog, createLiblogConfig } from '@kaotypr/liblog';
+import { createLiblog, LiblogConfig } from '@kaotypr/liblog';
 
-// Initialize with default configuration
-const liblogConfig = createLiblogConfig();
-const liblog = createLiblog(liblogConfig.get);
+// Initialize liblog config
+const liblogConfig = new LiblogConfig();
 
-// Enable info level logging
+// Create liblog utils
+const liblog = createLiblog(liblogConfig);
+
+// Try to log without log level set to true
+liblog.info('this is not printed'); // no output
+
+// Set "info" log level to true
 liblogConfig.set({
   info: true,
 });
 
-// Log messages
-liblog.info('Hello, world!'); // Output: Hello, world!
+// Try to log again
+liblog.info('hello world'); // Output: hello world
+
+// Set the config to false using logger's config
+liblog.config.set({
+  info: false,
+});
+
+// Try to log again
+liblog.info('this is not printed'); // No output
 ```
 
 ### Scoped Logging
 
 ```typescript
-import { createLiblog, createLiblogConfig } from '@kaotypr/liblog';
+import { createLiblog, LiblogConfig } from '@kaotypr/liblog';
 
 // Define your scope types
-type Scope = 'auth' | 'api' | 'db';
+type Scopes = 'api' | 'auth' | 'db';
 
 // Initialize with scopes
-const liblogConfig = createLiblogConfig<Scope>();
+const liblogConfig = new LiblogConfig<Scopes>();
 
 // Create scoped loggers
-const authLog = createLiblog(liblogConfig.get, { scope: 'auth' });
-const apiLog = createLiblog(liblogConfig.get, { scope: 'api' });
+const apiLog = createLiblog(liblogConfig, { scope: 'api' });
+const authLog = createLiblog(liblogConfig, { scope: 'auth' });
 
 // Enable logging for specific scopes
 liblogConfig.set(['auth', 'api'], {
@@ -66,26 +79,39 @@ liblogConfig.set(['auth', 'api'], {
 });
 
 // Use scoped logging
-authLog.info('User logged in'); // Output: [auth]: User logged in
-apiLog.error('Request failed'); // Output: [api]: Request failed
+apiLog.info('Request received'); // Output: [api]: Request received
+authLog.error('Login failed'); // Output: [auth]: Login failed
+
+// Disable specific scope
+apiLog.config.set({
+  info: false,
+  error: false,
+});
+
+apiLog.info('Not visible'); // No output
+authLog.error('Still visible'); // Output: [auth]: Still visible
 ```
 
 ### Custom Scope Prefixes
 
 ```typescript
-import { createLiblog, createLiblogConfig } from '@kaotypr/liblog';
+import { createLiblog, LiblogConfig } from '@kaotypr/liblog';
 
-const liblogConfig = createLiblogConfig<'custom'>();
+const liblogConfig = new LiblogConfig<'api' | 'auth' | 'db'>();
 
-// Custom prefix function
-const logger = createLiblog(liblogConfig.get, {
-  scope: 'custom',
-  scopePrefix: (scope) => `${scope.toUpperCase()} >>`,
+// Different prefix styles
+const apiLog = createLiblog(liblogConfig, { scope: 'api' });                           // Default prefix
+const authLog = createLiblog(liblogConfig, { scope: 'auth', scopePrefix: false });     // No prefix
+const dbLog = createLiblog(liblogConfig, { 
+  scope: 'db', 
+  scopePrefix: (scope) => `${scope.toUpperCase()} >>`  // Custom prefix
 });
 
-liblogConfig.set('custom', { info: true });
+liblogConfig.set(['api', 'auth', 'db'], { info: true });
 
-logger.info('Hello'); // Output: CUSTOM >> Hello
+apiLog.info('Hello');   // Output: [api]: Hello
+authLog.info('Hello');  // Output: Hello
+dbLog.info('Hello');    // Output: DB >> Hello
 ```
 
 ## Available Log Levels
@@ -99,6 +125,7 @@ logger.info('Hello'); // Output: CUSTOM >> Hello
 
 ## Configuration
 
+### Setting default log levels 
 ```typescript
 liblogConfig.set({
   verbose: true,  // Enable debug logging
@@ -107,6 +134,47 @@ liblogConfig.set({
   error: true,    // Enable error logging
   dir: true,      // Enable dir logging
   table: true,    // Enable table logging
+});
+```
+
+### Setting scope log levels 
+```typescript
+liblogConfig.set('scope1', {
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
+});
+
+liblogConfig.set(['scope1', 'scope2'], {
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
+});
+```
+
+### Setting log level from created liblog utils
+```typescript
+const liblogConfig = new LiblogConfig<'feature'>();
+const appLog = createLiblog(liblogConfig);
+const featureLog = createLiblog(liblogConfig, { scope: 'feature' });
+
+appLog.config.set({
+  verbose: true,  // Enable debug logging
+  info: true,     // Enable info logging
+  warning: true,  // Enable warning logging
+  error: true,    // Enable error logging
+  dir: true,      // Enable dir logging
+  table: true,    // Enable table logging
+});
+
+featureLog.config.set({
+  verbose: true,   // Enable debug logging only on feature scope
 });
 ```
 

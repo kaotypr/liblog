@@ -1,18 +1,16 @@
-import { ScopeConfig } from './types';
+import { LiblogConfig } from './liblog-config';
+import { LogLevelConfig } from './types';
 
-interface CreateLiblogOptions<S extends string> {
+interface CreateLiblogOptions<S> {
   scope: S;
   scopePrefix?: boolean | ((s: S) => string);
 }
 
-const DEFAULT_OPTIONS: CreateLiblogOptions<any> = {
-  scope: 'default',
-};
-
 export const createLiblog = <S extends string>(
-  configGetter: (scope: S) => ScopeConfig,
-  options: CreateLiblogOptions<S> = DEFAULT_OPTIONS
+  config: LiblogConfig<S>,
+  options: CreateLiblogOptions<S> = { scope: 'default' as S, scopePrefix: false }
 ) => {
+  const getCurrentConfig = () => config.get(options.scope);
   const { scopePrefix = true } = options;
   const withPrefix = options.scope === 'default' ? false : scopePrefix;
   const prefix = withPrefix
@@ -22,43 +20,47 @@ export const createLiblog = <S extends string>(
     : undefined;
 
   return {
-    warn: (...args: any[]) => {
-      const config = configGetter(options.scope);
-      if (config?.warning) {
+    warn: (...args: unknown[]) => {
+      if (getCurrentConfig()?.warning) {
         console.warn(...(prefix ? [prefix, ...args] : args));
       }
     },
-    error: (...args: any[]) => {
-      const config = configGetter(options.scope);
-      if (config?.error) {
+    error: (...args: unknown[]) => {
+      if (getCurrentConfig()?.error) {
         console.error(...(prefix ? [prefix, ...args] : args));
       }
     },
-    info: (...args: any[]) => {
-      const config = configGetter(options.scope);
-      if (config?.info) {
+    info: (...args: unknown[]) => {
+      if (getCurrentConfig()?.info) {
         console.info(...(prefix ? [prefix, ...args] : args));
       }
     },
-    debug: (...args: any[]) => {
-      const config = configGetter(options.scope);
-      if (config?.verbose) {
+    debug: (...args: unknown[]) => {
+      if (getCurrentConfig()?.verbose) {
         console.debug(...(prefix ? [prefix, ...args] : args));
       }
     },
-    dir: (...args: any[]) => {
-      const config = configGetter(options.scope);
-      if (config?.verbose) {
+    dir: (...args: unknown[]) => {
+      if (getCurrentConfig()?.verbose) {
         if (prefix) console.log(prefix);
         console.dir(...args);
       }
     },
-    table: (...args: any[]) => {
-      const config = configGetter(options.scope);
-      if (config?.verbose) {
+    table: (...args: unknown[]) => {
+      if (getCurrentConfig()?.verbose) {
         if (prefix) console.log(prefix);
         console.table(...args);
       }
+    },
+    config: {
+      get: getCurrentConfig,
+      set: (nextConfig: Partial<LogLevelConfig>) => {
+        if (options.scope === 'default') {
+          config.set(nextConfig);
+          return;
+        }
+        config.set(options.scope, nextConfig);
+      },
     },
   };
 };

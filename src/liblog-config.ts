@@ -1,8 +1,6 @@
-import type { ConsoleLevel } from './types';
+import type { LogLevelConfig } from './types';
 
-type ConsoleLevelConfig = Record<ConsoleLevel, boolean>;
-
-const DEFAULT_CONFIG: ConsoleLevelConfig = {
+const DEFAULT_CONFIG: LogLevelConfig = {
   verbose: false,
   info: false,
   warning: false,
@@ -11,13 +9,14 @@ const DEFAULT_CONFIG: ConsoleLevelConfig = {
   table: false,
 };
 
-export function createLiblogConfig<S extends string>() {
-  const configStore = new Map<S | 'default', ConsoleLevelConfig>([['default', DEFAULT_CONFIG]]);
+export class LiblogConfig<S extends string> {
+  private configStore: Map<S | 'default', LogLevelConfig>;
 
-  const setConfig = (
-    arg1: S[] | S | 'default' | Partial<ConsoleLevelConfig>,
-    arg2: Partial<ConsoleLevelConfig> = {}
-  ) => {
+  constructor() {
+    this.configStore = new Map([['default', DEFAULT_CONFIG]]);
+  }
+
+  set(arg1: S[] | S | Partial<LogLevelConfig>, arg2: Partial<LogLevelConfig> = {}) {
     let config;
     let target;
 
@@ -31,25 +30,20 @@ export function createLiblogConfig<S extends string>() {
 
     if (Array.isArray(target)) {
       for (const scope of target) {
-        const currentConfig = configStore.get(scope) || DEFAULT_CONFIG;
-        configStore.set(scope, { ...currentConfig, ...config });
+        const currentConfig = this.configStore.get(scope) || DEFAULT_CONFIG;
+        this.configStore.set(scope, { ...currentConfig, ...config });
       }
       return;
     }
     if (target) {
-      const currentConfig = configStore.get(target) || DEFAULT_CONFIG;
-      configStore.set(target, { ...currentConfig, ...config });
+      const currentConfig = this.configStore.get(target) || DEFAULT_CONFIG;
+      this.configStore.set(target, { ...currentConfig, ...config });
       return;
     }
-  };
+  }
 
-  const getConfig = (target: S | 'default') => {
-    if (configStore.has(target)) return configStore.get(target)!;
-    return configStore.get('default')!;
-  };
-
-  return {
-    get: getConfig,
-    set: setConfig,
-  };
+  get(target?: S): LogLevelConfig {
+    if (target && this.configStore.has(target)) return this.configStore.get(target)!;
+    return this.configStore.get('default')!;
+  }
 }

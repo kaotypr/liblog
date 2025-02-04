@@ -1,3 +1,3 @@
-export type ConsoleLevel = 'verbose' | 'info' | 'warning' | 'error' | 'dir' | 'table';
+export type LogLevel = 'verbose' | 'info' | 'warning' | 'error' | 'dir' | 'table';
 
-export type ScopeConfig = Record<ConsoleLevel, boolean>;
+export type LogLevelConfig = Record<LogLevel, boolean>;

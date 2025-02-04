@@ -1,18 +1,38 @@
 import { createLiblog } from '../src/liblog';
-import { createLiblogConfig } from '../src/liblog-config';
+import { LiblogConfig } from '../src/liblog-config';
 
-// Initialize liblog with scopes type
-const liblogConfig = createLiblogConfig<'aaa' | 'bbb' | 'ccc'>();
+type Scopes = 'api' | 'auth' | 'db' | 'client';
+const liblogConfig = new LiblogConfig<Scopes>();
 
 // Create liblog utils for each scope
-const aaaLog = createLiblog(liblogConfig.get, { scope: 'aaa' });
-const bbblog = createLiblog(liblogConfig.get, { scope: 'bbb', scopePrefix: false });
-const ccclog = createLiblog(liblogConfig.get, { scope: 'ccc', scopePrefix: (s) => `${String(s).toUpperCase()} >>` });
+const apiLog = createLiblog(liblogConfig, { scope: 'api' });
+const authLog = createLiblog(liblogConfig, { scope: 'auth', scopePrefix: false });
+const dbLog = createLiblog(liblogConfig, { scope: 'db', scopePrefix: () => 'DB >>' });
+const clientLog = createLiblog(liblogConfig, { scope: 'client', scopePrefix: (s) => `__${s}__` });
 
-liblogConfig.set(['aaa', 'bbb', 'ccc'], {
-  info: true,
+liblogConfig.set(['api', 'auth'], {
+  verbose: true,
 });
 
-aaaLog.info('hello world'); // scope prefix added by default => console.info('[aaa]:', 'hello world')
-bbblog.info('hello world'); // no prefix on scopePrefix: false => console.info('hello world')
-ccclog.info('hello world'); // custom prefix: console.info('CCC >>', 'hello world')
+liblogConfig.set('db', {
+  warning: true,
+});
+
+clientLog.config.set({
+  error: true,
+});
+
+apiLog.debug('hello world'); // scope prefix added by default => console.debug('[aaa]:', 'hello world')
+authLog.debug('hello world'); // no prefix on scopePrefix: false => console.debug('hello world')
+dbLog.warn('warning!'); // custom prefix: console.warn('DB >>', 'warning!')
+clientLog.error('error!!'); // custom prefix: console.error('__client__', 'error')
+
+/**
+ * bun run examples/v2/scope-options.ts
+ * Output:
+ *
+ * [api]: hello world
+ * hello world
+ * DB >> warning!
+ * __client__ error!!
+ */
